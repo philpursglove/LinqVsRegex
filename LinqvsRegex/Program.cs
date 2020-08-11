@@ -11,10 +11,13 @@ namespace LinqvsRegex
         public static int Iterations { get; set; }
         public static List<long> Ticks { get; set; }
 
+        public static bool UseCompiledRegex { get; set; }
+
         static void Main()
         {
             Iterations = 100;
             Ticks = new List<long>(Iterations);
+            UseCompiledRegex = false;
 
             string option;
             do
@@ -28,15 +31,18 @@ namespace LinqvsRegex
                         SetIterations();
                         break;
                     case "2":
-                        ContainsUpperCase();
+                        ToggleCompiledRegex();
                         break;
                     case "3":
-                        ContainsLowerCase();
+                        ContainsUpperCase();
                         break;
                     case "4":
-                        ContainsDigit();
+                        ContainsLowerCase();
                         break;
                     case "5":
+                        ContainsDigit();
+                        break;
+                    case "6":
                         ContainsUpperCase();
                         ContainsLowerCase();
                         ContainsDigit();
@@ -52,13 +58,26 @@ namespace LinqvsRegex
 
         }
 
+        private static void ToggleCompiledRegex()
+        {
+            UseCompiledRegex = !UseCompiledRegex;
+        }
+
         private static void ContainsDigit()
         {
             Stopwatch sw = new Stopwatch();
             Console.WriteLine("Digit test");
 
             string containsDigit = "abcdef1";
-            Regex digitRegex = new Regex("[0-9]");
+            Regex digitRegex;
+            if (UseCompiledRegex)
+            {
+                digitRegex = new Regex("[0-9]", RegexOptions.Compiled);
+            }
+            else
+            {
+                digitRegex = new Regex("[0-9]");
+            }
 
             for (int i = 0; i < Iterations; i++)
             {
@@ -96,7 +115,15 @@ namespace LinqvsRegex
             Console.WriteLine("Lower case test");
 
             string containsLowerCase = "ABcDEF";
-            Regex lowerCaseRegex = new Regex("[a-z]");
+            Regex lowerCaseRegex;
+            if (UseCompiledRegex)
+            {
+                lowerCaseRegex = new Regex("[a-z]", RegexOptions.Compiled);
+            }
+            else
+            {
+                lowerCaseRegex = new Regex("[a-z]");
+            }
 
             for (int i = 0; i < Iterations; i++)
             {
@@ -133,7 +160,15 @@ namespace LinqvsRegex
         {
             Stopwatch sw = new Stopwatch();
             string containsUpperCase = "abcDef";
-            Regex upperCaseRegex = new Regex("[A-Z]");
+            Regex upperCaseRegex;
+            if (UseCompiledRegex)
+            {
+                upperCaseRegex = new Regex("[A-Z]", RegexOptions.Compiled);
+            }
+            else
+            {
+                upperCaseRegex = new Regex("[A-Z]");
+            }
 
             Console.WriteLine("Upper case test");
 
@@ -173,10 +208,11 @@ namespace LinqvsRegex
             Console.WriteLine("Linq vs Regex");
             Console.WriteLine("=============");
             Console.WriteLine($"1. Set number of iterations. (Current: {Iterations})");
-            Console.WriteLine("2. Upper case test");
-            Console.WriteLine("3. Lower case test");
-            Console.WriteLine("4. Digit test");
-            Console.WriteLine("5. Run all tests");
+            Console.WriteLine($"2: Toggle compiled Regexes. (Current: {UseCompiledRegex})");
+            Console.WriteLine("3. Upper case test");
+            Console.WriteLine("4. Lower case test");
+            Console.WriteLine("5. Digit test");
+            Console.WriteLine("6. Run all tests");
             Console.WriteLine("9. Exit");
         }
 
